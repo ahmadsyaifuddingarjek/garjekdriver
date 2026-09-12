@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendaftaran Mitra Driver GARJEK</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        garjek: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .step-active { background-color: #16a34a; color: white; border-color: #16a34a; }
+        .step-done { background-color: #22c55e; color: white; border-color: #22c55e; }
+        .step-inactive { background-color: #f3f4f6; color: #6b7280; border-color: #e5e7eb; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white; color: black; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between">
+
+    <!-- Header / Navbar -->
+    <header class="bg-garjek-700 text-white shadow-lg sticky top-0 z-40 no-print">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('register')">
+                <div class="bg-white text-garjek-700 p-2 rounded-xl shadow-md font-black text-xl tracking-wider flex items-center justify-center w-10 h-10">
+                    GJ
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-tight leading-none">GARJEK</h1>
+                    <p class="text-xs text-garjek-100 font-medium tracking-wide">Mitra Driver Portal</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button onclick="switchTab('register')" id="btn-tab-register" class="px-3 py-1.5 text-xs md:text-sm font-semibold rounded-lg bg-white/20 hover:bg-white/30 transition flex items-center gap-1.5">
+                    <i class="fas fa-user-plus"></i> <span class="hidden sm:inline">Daftar</span>
+                </button>
+                <button onclick="switchTab('status')" id="btn-tab-status" class="px-3 py-1.5 text-xs md:text-sm font-semibold rounded-lg hover:bg-white/20 transition flex items-center gap-1.5">
+                    <i class="fas fa-search"></i> <span>Cek Status</span>
+                </button>
+                <button onclick="openConfigModal()" class="p-2 text-xs font-semibold rounded-lg hover:bg-white/20 transition" title="Pengaturan Web App Backend">
+                    <i class="fas fa-cog text-base"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl mx-auto w-full px-4 py-6 flex-grow">
+
+        <!-- Notification Toast Banner -->
+        <div id="toast-container" class="fixed top-16 right-4 z-50 space-y-2 max-w-sm"></div>
+
+        <!-- System URL Banner Notice (If Web App URL missing) -->
+        <div id="backend-warning" class="hidden mb-6 bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm no-print">
+            <div class="flex items-start">
+                <i class="fas fa-exclamation-triangle text-amber-500 text-xl mt-0.5 mr-3"></i>
+                <div class="flex-1">
+                    <h3 class="text-sm font-bold text-amber-800">URL Web App Belum Dikonfigurasi</h3>
+                    <p class="text-xs text-amber-700 mt-1">Sistem saat ini berjalan dalam mode Simulasi/Demo. Untuk menyimpan ke Google Spreadsheet & Drive nyata, masukkan URL Web App Google Apps Script Anda.</p>
+                    <button onclick="openConfigModal()" class="mt-2 text-xs font-semibold bg-amber-600 text-white px-3 py-1 rounded-md hover:bg-amber-700 transition shadow-sm">
+                        Set URL Web App
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 1: REGISTRATION WIZARD ================= -->
+        <div id="tab-register" class="space-y-6">
+
+            <!-- Hero Section -->
+            <div class="bg-gradient-to-r from-garjek-800 to-garjek-600 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden no-print">
+                <div class="relative z-10 max-w-2xl">
+                    <span class="bg-white/20 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">Pendaftaran Resmi</span>
+                    <h2 class="text-2xl md:text-3xl font-extrabold mb-2 leading-tight">PENDAFTARAN MITRA DRIVER GARJEK</h2>
+                    <p class="text-xs md:text-sm text-garjek-100 font-light leading-relaxed">
+                        Bergabunglah menjadi bagian dari keluarga besar GARJEK. Nikmati fleksibilitas kerja, penghasilan harian menarik, dan bonus melimpah.
+                    </p>
+                </div>
+                <i class="fas fa-motorcycle text-white/10 text-9xl absolute -right-6 -bottom-6 pointer-events-none"></i>
+            </div>
+
+            <!-- Progress Step Indicator -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 no-print">
+                <div class="flex justify-between items-center relative">
+                    <!-- Progress Line -->
+                    <div class="absolute top-1/2 left-0 w-full h-1 bg-slate-200 -translate-y-1/2 z-0"></div>
+                    <div id="progress-bar-fill" class="absolute top-1/2 left-0 h-1 bg-garjek-600 -translate-y-1/2 z-0 transition-all duration-300" style="width: 0%;"></div>
+
+                    <!-- Steps Dots -->
+                    <div class="step-indicator z-10 flex flex-col items-center cursor-pointer" onclick="goToStep(1)">
+                        <div id="step-dot-1" class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 step-active transition shadow">1</div>
+                        <span class="text-[10px] font-semibold mt-1 text-slate-600 hidden sm:block">Data Diri</span>
+                    </div>
+                    <div class="step-indicator z-10 flex flex-col items-center cursor-pointer" onclick="goToStep(2)">
+                        <div id="step-dot-2" class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 step-inactive transition shadow">2</div>
+                        <span class="text-[10px] font-semibold mt-1 text-slate-600 hidden sm:block">Layanan</span>
+                    </div>
+                    <div class="step-indicator z-10 flex flex-col items-center cursor-pointer" onclick="goToStep(3)">
+                        <div id="step-dot-3" class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 step-inactive transition shadow">3</div>
+                        <span class="text-[10px] font-semibold mt-1 text-slate-600 hidden sm:block">Kendaraan</span>
+                    </div>
+                    <div class="step-indicator z-10 flex flex-col items-center cursor-pointer" onclick="goToStep(4)">
+                        <div id="step-dot-4" class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 step-inactive transition shadow">4</div>
+                        <span class="text-[10px] font-semibold mt-1 text-slate-600 hidden sm:block">Dokumen</span>
+                    </div>
+                    <div class="step-indicator z-10 flex flex-col items-center cursor-pointer" onclick="goToStep(5)">
+                        <div id="step-dot-5" class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 step-inactive transition shadow">5</div>
+                        <span class="text-[10px] font-semibold mt-1 text-slate-600 hidden sm:block">Pembayaran</span>
+                    </div>
+                    <div class="step-indicator z-10 flex flex-col items-center cursor-pointer" onclick="goToStep(6)">
+                        <div id="step-dot-6" class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 step-inactive transition shadow">6</div>
+                        <span class="text-[10px] font-semibold mt-1 text-slate-600 hidden sm:block">Selesai</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Registration Form Card -->
+            <form id="form-registration" onsubmit="handleFormSubmit(event)" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                
+                <!-- ================= STEP 1: DATA DIRI ================= -->
+                <div id="step-1" class="p-6 space-y-5">
+                    <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                        <h3 class="text-lg font-extrabold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-id-card text-garjek-600"></i> Tahap 1: Data Diri Pendaftar
+                        </h3>
+                        <span class="text-xs bg-slate-100 font-semibold text-slate-600 px-2.5 py-1 rounded-full">Langkah 1 dari 5</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Nama Lengkap -->
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Lengkap (Sesuai KTP) <span class="text-red-500">*</span></label>
+                            <input type="text" id="nama_lengkap" required oninput="this.value = this.value.toUpperCase()" 
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-garjek-500 focus:border-garjek-500 text-sm uppercase font-semibold text-slate-800 placeholder-slate-400" placeholder="CONTOH: AHMAD SYAIFUDDIN">
+                            <p class="text-[11px] text-slate-400 mt-0.5">Otomatis diubah menjadi HURUF BESAR.</p>
+                        </div>
+
+                        <!-- NIK -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">NIK (Nomor Induk Kependudukan) <span class="text-red-500">*</span></label>
+                            <input type="text" id="nik" maxlength="16" required oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-garjek-500 text-sm font-mono tracking-widest text-slate-800" placeholder="16 Digit Angka NIK">
+                            <p id="nik-validation-msg" class="text-[11px] text-slate-400 mt-0.5">Wajib tepat 16 digit angka.</p>
+                        </div>
+
+                        <!-- Jenis Kelamin -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Jenis Kelamin <span class="text-red-500">*</span></label>
+                            <select id="jenis_kelamin" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-garjek-500 text-sm font-medium text-slate-800 bg-white">
+                                <option value="">-- Pilih Jenis Kelamin --</option>
+                                <option value="LAKI-LAKI">LAKI-LAKI</option>
+                                <option value="PEREMPUAN">PEREMPUAN</option>
+                            </select>
+                        </div>
+
+                        <!-- Tempat Lahir -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Tempat Lahir <span class="text-red-500">*</span></label>
+                            <input type="text" id="tempat_lahir" required oninput="this.value = this.value.toUpperCase()"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-garjek-500 text-sm uppercase font-medium text-slate-800" placeholder="KOTA LAHIR">
+                        </div>
+
+                        <!-- Tanggal Lahir -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Tanggal Lahir <span class="text-red-500">*</span></label>
+                            <input type="date" id="tanggal_lahir" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-garjek-500 text-sm font-medium text-slate-800">
+                        </div>
+
+                        <!-- Nomor WhatsApp -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nomor WhatsApp <span class="text-red-500">*</span></label>
+                            <input type="tel" id="no_whatsapp" required oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-garjek-500 text-sm font-mono text-slate-800" placeholder="081234567890">
+                            <p class="text-[11px] text-slate-400 mt-0.5">Gunakan format angka diawali 08.</p>
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Email <span class="text-red-500">*</span></label>
+                            <input type="email" id="email" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-garjek-500 text-sm font-medium text-slate-800" placeholder="email@contoh.com">
+                        </div>
+
+                        <!-- Status Pernikahan -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Status Pernikahan <span class="text-red-500">*</span></label>
+                            <select id="status_pernikahan" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-garjek-500 text-sm font-medium text-slate-800 bg-white">
+                                <option value="">-- Pilih Status --</option>
+                                <option value="BELUM MENIKAH">BELUM MENIKAH</option>
+                                <option value="MENIKAH">MENIKAH</option>
+                                <option value="CERAI">CERAI</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Sub-section Alamat KTP -->
+                    <div class="pt-4 border-t border-slate-100">
+                        <h4 class="text-sm font-extrabold text-slate-700 uppercase tracking-wide mb-3 flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-garjek-600"></i> Alamat Lengkap Sesuai KTP
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Negara</label>
+                                <input type="text" id="negara" value="INDONESIA" readonly class="w-full px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-600">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Provinsi <span class="text-red-500">*</span></label>
+                                <input type="text" id="provinsi" required oninput="this.value = this.value.toUpperCase()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs uppercase font-medium text-slate-800" placeholder="JAWA BARAT">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Kabupaten/Kota <span class="text-red-500">*</span></label>
+                                <input type="text" id="kabupaten" required oninput="this.value = this.value.toUpperCase()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs uppercase font-medium text-slate-800" placeholder="KOTA BEKASI">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Kecamatan <span class="text-red-500">*</span></label>
+                                <input type="text" id="kecamatan" required oninput="this.value = this.value.toUpperCase()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs uppercase font-medium text-slate-800" placeholder="BEKASI SELATAN">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Desa/Kelurahan <span class="text-red-500">*</span></label>
+                                <input type="text" id="kelurahan" required oninput="this.value = this.value.toUpperCase()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs uppercase font-medium text-slate-800" placeholder="PEKAYON JAYA">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Dusun / Lingkungan</label>
+                                <input type="text" id="dusun" oninput="this.value = this.value.toUpperCase()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs uppercase font-medium text-slate-800" placeholder="DUSUN I">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">RT <span class="text-red-500">*</span></label>
+                                    <input type="text" id="rt" required oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="3" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono text-slate-800" placeholder="001">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">RW <span class="text-red-500">*</span></label>
+                                    <input type="text" id="rw" required oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="3" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono text-slate-800" placeholder="002">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Kode Pos <span class="text-red-500">*</span></label>
+                                <input type="text" id="kode_pos" required oninput="this.value = this.value.replace(/[^0-9]/g, '')" maxlength="5" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs font-mono text-slate-800" placeholder="17148">
+                            </div>
+                            <div class="md:col-span-3">
+                                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">Alamat Lengkap (Jalan, No. Rumah, Blok) <span class="text-red-500">*</span></label>
+                                <textarea id="alamat_lengkap" required rows="2" oninput="this.value = this.value.toUpperCase()" class="w-full px-3 py-2 rounded-xl border border-slate-300 text-xs uppercase font-medium text-slate-800" placeholder="JL. AHMAD YANI NO. 123 BLOK A4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-4">
+                        <button type="button" onclick="nextStep(1)" class="w-full sm:w-auto px-6 py-3 bg-garjek-600 hover:bg-garjek-700 text-white font-bold text-sm rounded-xl transition shadow-md flex items-center justify-center gap-2">
+                            Lanjut: Pilih Layanan <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ================= STEP 2: PILIHAN LAYANAN ================= -->
+                <div id="step-2" class="p-6 space-y-5 hidden">
+                    <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                        <h3 class="text-lg font-extrabold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-cubes text-garjek-600"></i> Tahap 2: Pilih Layanan Driver
+                        </h3>
+                        <span class="text-xs bg-slate-100 font-semibold text-slate-600 px-2.5 py-1 rounded-full">Langkah 2 dari 5</span>
+                    </div>
+
+                    <p class="text-xs text-slate-500">Pilih jenis kemitraan driver yang ingin Anda daftarkan:</p>
+
+                    <input type="hidden" id="pilihan_layanan" value="GARBIKE">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- GARBIKE Card -->
+                        <div id="card-garbike" onclick="selectService('GARBIKE')" class="cursor-pointer border-2 border-garjek-600 bg-garjek-50 p-5 rounded-2xl transition hover:shadow-lg relative flex flex-col justify-between">
+                            <div class="absolute top-3 right-3 text-garjek-600" id="icon-check-garbike">
+                                <i class="fas fa-check-circle text-2xl"></i>
+                            </div>
+                            <div>
+                                <div class="w-12 h-12 bg-garjek-600 text-white rounded-xl flex items-center justify-center text-2xl mb-3 shadow">
+                                    <i class="fas fa-motorcycle"></i>
+                                </div>
+                                <h4 class="text-lg font-black text-slate-900">GARBIKE</h4>
+                                <p class="text-xs text-slate-600 mt-1">Layanan pengantaran penumpang & barang menggunakan sepeda motor.</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-garjek-200/60 flex items-center justify-between text-xs">
+                                <span class="font-bold text-slate-700">Biaya Atribut:</span>
+                                <span class="font-extrabold text-garjek-700 bg-garjek-100 px-2 py-0.5 rounded" id="display-fee-garbike">Rp 150.000</span>
+                            </div>
+                        </div>
+
+                        <!-- GARCAR Card -->
+                        <div id="card-garcar" onclick="selectService('GARCAR')" class="cursor-pointer border-2 border-slate-200 bg-white p-5 rounded-2xl transition hover:shadow-lg relative flex flex-col justify-between">
+                            <div class="absolute top-3 right-3 text-slate-300 hidden" id="icon-check-garcar">
+                                <i class="fas fa-check-circle text-2xl"></i>
+                            </div>
+                            <div>
+                                <div class="w-12 h-12 bg-slate-700 text-white rounded-xl flex items-center justify-center text-2xl mb-3 shadow">
+                                    <i class="fas fa-car"></i>
+                                </div>
+                                <h4 class="text-lg font-black text-slate-900">GARCAR</h4>
+                                <p class="text-xs text-slate-600 mt-1">Layanan pengantaran mobil roda empat profesional dan nyaman.</p>
+                            </div>
+                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                                <span class="font-bold text-slate-700">Biaya Atribut:</span>
+                                <span class="font-extrabold text-slate-700 bg-slate-100 px-2 py-0.5 rounded" id="display-fee-garcar">Rp 0 (Gratis)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between pt-4">
+                        <button type="button" onclick="prevStep(2)" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </button>
+                        <button type="button" onclick="nextStep(2)" class="px-6 py-2.5 bg-garjek-600 hover:bg-garjek-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-2">
+                            Lanjut: Data Kendaraan <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ================= STEP 3: DATA KENDARAAN ================= -->
+                <div id="step-3" class="p-6 space-y-5 hidden">
+                    <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                        <h3 class="text-lg font-extrabold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-car-side text-garjek-600"></i> Tahap 3: Data Kendaraan (<span id="title-service-type">GARBIKE</span>)
+                        </h3>
+                        <span class="text-xs bg-slate-100 font-semibold text-slate-600 px-2.5 py-1 rounded-full">Langkah 3 dari 5</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Plat Nomor -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nomor Polisi (Plat Nomor) <span class="text-red-500">*</span></label>
+                            <input type="text" id="nomor_polisi" required oninput="this.value = this.value.toUpperCase()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono uppercase font-bold text-slate-800" placeholder="B 1234 ABC">
+                        </div>
+
+                        <!-- Merek Kendaraan -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Merek Kendaraan <span class="text-red-500">*</span></label>
+                            <input type="text" id="merek_kendaraan" required oninput="this.value = this.value.toUpperCase()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm uppercase font-medium text-slate-800" placeholder="HONDA / YAMAHA / TOYOTA">
+                        </div>
+
+                        <!-- Tipe Kendaraan -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Tipe Kendaraan <span class="text-red-500">*</span></label>
+                            <input type="text" id="tipe_kendaraan" required oninput="this.value = this.value.toUpperCase()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm uppercase font-medium text-slate-800" placeholder="VARIO 150 / AVANZA 1.3">
+                        </div>
+
+                        <!-- Tahun Kendaraan -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Tahun Kendaraan <span class="text-red-500">*</span></label>
+                            <input type="number" id="tahun_kendaraan" min="2012" max="2027" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium text-slate-800" placeholder="2020">
+                            <p class="text-[11px] text-slate-400 mt-0.5">Minimal tahun 2012 ke atas.</p>
+                        </div>
+
+                        <!-- Warna Kendaraan -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Warna Kendaraan <span class="text-red-500">*</span></label>
+                            <input type="text" id="warna_kendaraan" required oninput="this.value = this.value.toUpperCase()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm uppercase font-medium text-slate-800" placeholder="HITAM METAMORFO">
+                        </div>
+
+                        <!-- Nomor STNK -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nomor STNK <span class="text-red-500">*</span></label>
+                            <input type="text" id="nomor_stnk" required oninput="this.value = this.value.toUpperCase()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-mono uppercase text-slate-800" placeholder="1234567890">
+                        </div>
+
+                        <!-- Nama Pemilik Kendaraan -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Nama Pemilik STNK <span class="text-red-500">*</span></label>
+                            <input type="text" id="nama_pemilik_stnk" required oninput="this.value = this.value.toUpperCase()" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm uppercase font-medium text-slate-800" placeholder="NAMA SESUAI STNK">
+                        </div>
+
+                        <!-- Status Kepemilikan -->
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Status Kepemilikan <span class="text-red-500">*</span></label>
+                            <select id="status_kepemilikan" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm font-medium text-slate-800 bg-white">
+                                <option value="MILIK SENDIRI">MILIK SENDIRI</option>
+                                <option value="MILIK KELUARGA">MILIK KELUARGA</option>
+                                <option value="SEWA / RENTAL">SEWA / RENTAL</option>
+                                <option value="LAINNYA">LAINNYA</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between pt-4">
+                        <button type="button" onclick="prevStep(3)" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </button>
+                        <button type="button" onclick="nextStep(3)" class="px-6 py-2.5 bg-garjek-600 hover:bg-garjek-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-2">
+                            Lanjut: Upload Dokumen <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ================= STEP 4: UPLOAD DOKUMEN ================= -->
+                <div id="step-4" class="p-6 space-y-5 hidden">
+                    <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                        <h3 class="text-lg font-extrabold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-file-upload text-garjek-600"></i> Tahap 4: Upload Dokumen Persyaratan
+                        </h3>
+                        <span class="text-xs bg-slate-100 font-semibold text-slate-600 px-2.5 py-1 rounded-full">Langkah 4 dari 5</span>
+                    </div>
+
+                    <p class="text-xs text-slate-500">Format yang didukung: JPG, JPEG, PNG, atau PDF. Maksimal 5MB per file.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Foto KTP -->
+                        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">1. Foto KTP Asli <span class="text-red-500">*</span></label>
+                            <input type="file" id="file_ktp" accept="image/jpeg,image/png,application/pdf" required onchange="handleFileSelect(this, 'preview-ktp')" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-garjek-100 file:text-garjek-700 hover:file:bg-garjek-200 cursor-pointer">
+                            <p id="preview-ktp" class="text-[11px] font-medium text-slate-500 mt-1 italic">Belum ada file dipilih</p>
+                        </div>
+
+                        <!-- Foto SIM -->
+                        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">2. Foto SIM Aktif <span class="text-red-500">*</span></label>
+                            <input type="file" id="file_sim" accept="image/jpeg,image/png,application/pdf" required onchange="handleFileSelect(this, 'preview-sim')" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-garjek-100 file:text-garjek-700 hover:file:bg-garjek-200 cursor-pointer">
+                            <p id="preview-sim" class="text-[11px] font-medium text-slate-500 mt-1 italic">Belum ada file dipilih</p>
+                        </div>
+
+                        <!-- Foto STNK -->
+                        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">3. Foto STNK Pajak Aktif <span class="text-red-500">*</span></label>
+                            <input type="file" id="file_stnk" accept="image/jpeg,image/png,application/pdf" required onchange="handleFileSelect(this, 'preview-stnk')" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-garjek-100 file:text-garjek-700 hover:file:bg-garjek-200 cursor-pointer">
+                            <p id="preview-stnk" class="text-[11px] font-medium text-slate-500 mt-1 italic">Belum ada file dipilih</p>
+                        </div>
+
+                        <!-- Foto Setengah Badan -->
+                        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">4. Foto Driver (Setengah Badan / Pasfoto) <span class="text-red-500">*</span></label>
+                            <input type="file" id="file_driver" accept="image/jpeg,image/png" required onchange="handleFileSelect(this, 'preview-driver')" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-garjek-100 file:text-garjek-700 hover:file:bg-garjek-200 cursor-pointer">
+                            <p id="preview-driver" class="text-[11px] font-medium text-slate-500 mt-1 italic">Belum ada file dipilih</p>
+                        </div>
+
+                        <!-- Foto Kendaraan Tampak Depan -->
+                        <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/50 md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">5. Foto Kendaraan (Tampak Depan Terlihat Plat Nomor) <span class="text-red-500">*</span></label>
+                            <input type="file" id="file_kendaraan" accept="image/jpeg,image/png" required onchange="handleFileSelect(this, 'preview-kendaraan')" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-garjek-100 file:text-garjek-700 hover:file:bg-garjek-200 cursor-pointer">
+                            <p id="preview-kendaraan" class="text-[11px] font-medium text-slate-500 mt-1 italic">Belum ada file dipilih</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between pt-4">
+                        <button type="button" onclick="prevStep(4)" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </button>
+                        <button type="button" onclick="nextStep(4)" class="px-6 py-2.5 bg-garjek-600 hover:bg-garjek-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-2">
+                            Lanjut: Pembayaran <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ================= STEP 5: PEMBAYARAN ================= -->
+                <div id="step-5" class="p-6 space-y-5 hidden">
+                    <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                        <h3 class="text-lg font-extrabold text-slate-800 flex items-center gap-2">
+                            <i class="fas fa-wallet text-garjek-600"></i> Tahap 5: Biaya Registrasi & Atribut
+                        </h3>
+                        <span class="text-xs bg-slate-100 font-semibold text-slate-600 px-2.5 py-1 rounded-full">Langkah 5 dari 5</span>
+                    </div>
+
+                    <!-- Payment Details Card -->
+                    <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Pembayaran</p>
+                                <h2 class="text-2xl md:text-3xl font-black text-garjek-500 mt-1" id="payment-amount-display">Rp 150.000</h2>
+                                <p class="text-xs text-slate-300 mt-1" id="payment-desc-display">Termasuk Jaket, Rompi, Helm & Aktivasi Akun Garjek</p>
+                            </div>
+                            <span class="bg-blue-600 text-white font-extrabold text-xs px-3 py-1 rounded-lg uppercase">DANA</span>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div>
+                                <p class="text-[11px] text-slate-400 uppercase font-semibold">Tujuan Transfer DANA:</p>
+                                <p class="text-sm font-extrabold text-white" id="dana-name-display">Ahmad Syaifuddin</p>
+                                <p class="text-base font-mono font-bold text-amber-400 tracking-wider" id="dana-number-display">081932592253</p>
+                            </div>
+                            <button type="button" onclick="copyDanaNumber()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold rounded-xl transition flex items-center gap-2 shadow self-start sm:self-auto">
+                                <i class="fas fa-copy"></i> SALIN NOMOR DANA
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Upload Bukti Pembayaran -->
+                    <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50">
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Unggah Bukti Pembayaran <span class="text-red-500">*</span></label>
+                        <input type="file" id="file_bukti" accept="image/jpeg,image/png,application/pdf" required onchange="handleFileSelect(this, 'preview-bukti')" class="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-garjek-100 file:text-garjek-700 hover:file:bg-garjek-200 cursor-pointer">
+                        <p id="preview-bukti" class="text-[11px] font-medium text-slate-500 mt-1 italic">Belum ada bukti pembayaran diunggah</p>
+                    </div>
+
+                    <!-- Disclaimer & Checkbox -->
+                    <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl">
+                        <label class="flex items-start gap-3 cursor-pointer">
+                            <input type="checkbox" id="check_agree" required class="mt-1 w-4 h-4 text-garjek-600 rounded border-slate-300 focus:ring-garjek-500">
+                            <span class="text-xs text-amber-900 font-medium leading-relaxed">
+                                Saya menyatakan bahwa seluruh data yang saya berikan adalah benar dan saya menyetujui penggunaan data untuk proses pendaftaran mitra driver Garjek. Pembayaran akan diverifikasi oleh Admin sebelum akun diaktifkan.
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Loading Progress Indicator during Submission -->
+                    <div id="submit-loading" class="hidden p-4 bg-slate-100 rounded-xl text-center space-y-2">
+                        <i class="fas fa-circle-notch fa-spin text-garjek-600 text-2xl"></i>
+                        <p class="text-xs font-bold text-slate-700" id="submit-loading-status">Sedang memproses & mengunggah dokumen...</p>
+                        <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div id="submit-progress-bar" class="bg-garjek-600 h-full w-1/3 transition-all duration-300"></div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between pt-4">
+                        <button type="button" onclick="prevStep(5)" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl transition">
+                            <i class="fas fa-arrow-left"></i> Kembali
+                        </button>
+                        <button type="submit" id="btn-submit-form" class="px-8 py-3 bg-garjek-600 hover:bg-garjek-700 text-white font-extrabold text-sm rounded-xl transition shadow-lg flex items-center gap-2">
+                            <i class="fas fa-paper-plane"></i> KIRIM PENDAFTARAN
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ================= STEP 6: KONFIRMASI BERHASIL ================= -->
+                <div id="step-6" class="p-6 space-y-6 hidden">
+                    <div class="text-center space-y-2">
+                        <div class="w-16 h-16 bg-garjek-100 text-garjek-600 rounded-full flex items-center justify-center text-3xl mx-auto shadow-sm">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h2 class="text-2xl font-black text-slate-800">PENDAFTARAN BERHASIL!</h2>
+                        <p class="text-xs text-slate-500">Data pendaftaran Anda telah berhasil tersimpan dalam sistem Garjek.</p>
+                    </div>
+
+                    <!-- Proof Card -->
+                    <div id="receipt-card" class="bg-white border-2 border-slate-200 rounded-2xl p-6 shadow-sm space-y-4 max-w-lg mx-auto">
+                        <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                            <div>
+                                <h3 class="text-sm font-black text-slate-800">BUKTI PENDAFTARAN MITRA</h3>
+                                <p class="text-[10px] text-slate-400">GARJEK Transportasi Online</p>
+                            </div>
+                            <span class="bg-amber-100 text-amber-800 font-bold text-[10px] px-2.5 py-1 rounded-full uppercase" id="rec-status">MENUNGGU VERIFIKASI</span>
+                        </div>
+
+                        <div class="space-y-2 text-xs">
+                            <div class="flex justify-between py-1 border-b border-slate-50">
+                                <span class="text-slate-500">Nomor Pendaftaran</span>
+                                <span class="font-mono font-extrabold text-garjek-700 text-sm" id="rec-id">GJ-20260912-0001</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-50">
+                                <span class="text-slate-500">Nama Driver</span>
+                                <span class="font-bold text-slate-800" id="rec-nama">-</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-50">
+                                <span class="text-slate-500">NIK</span>
+                                <span class="font-mono font-bold text-slate-800" id="rec-nik">-</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-50">
+                                <span class="text-slate-500">Layanan</span>
+                                <span class="font-bold text-slate-800" id="rec-layanan">-</span>
+                            </div>
+                            <div class="flex justify-between py-1 border-b border-slate-50">
+                                <span class="text-slate-500">Tanggal Pendaftaran</span>
+                                <span class="font-medium text-slate-800" id="rec-tanggal">-</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-[11px] text-slate-500">
+                            <p class="font-semibold text-slate-700 mb-1"><i class="fas fa-info-circle text-garjek-600"></i> Catatan penting:</p>
+                            Simpan Nomor Pendaftaran ini untuk melakukan pengecekan status verifikasi secara berkala melalui menu "Cek Status".
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row justify-center gap-3 no-print">
+                        <button type="button" onclick="window.print()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 shadow">
+                            <i class="fas fa-print"></i> CETAK / SIMPAN BUKTI PENDAFTARAN
+                        </button>
+                        <button type="button" onclick="location.reload()" class="px-5 py-2.5 bg-garjek-600 hover:bg-garjek-700 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 shadow">
+                            <i class="fas fa-plus-circle"></i> PENDAFTARAN BARU
+                        </button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- ================= TAB 2: CEK STATUS PENDAFTARAN ================= -->
+        <div id="tab-status" class="space-y-6 hidden">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                <div class="max-w-md mx-auto text-center space-y-3">
+                    <div class="w-12 h-12 bg-garjek-100 text-garjek-600 rounded-full flex items-center justify-center text-xl mx-auto">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h2 class="text-xl font-black text-slate-800">CEK STATUS PENDAFTARAN</h2>
+                    <p class="text-xs text-slate-500">Masukkan 16 Digit NIK yang Anda daftarkan untuk melihat perkembangan verifikasi dokumen dan pembayaran.</p>
+
+                    <div class="flex gap-2 pt-2">
+                        <input type="text" id="search-nik-input" maxlength="16" oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                            class="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono text-sm tracking-widest text-slate-800 focus:ring-2 focus:ring-garjek-500" placeholder="Masukkan 16 Digit NIK">
+                        <button onclick="searchRegistrationStatus()" class="px-5 py-2.5 bg-garjek-600 hover:bg-garjek-700 text-white font-bold text-xs rounded-xl transition shadow flex items-center gap-1.5 whitespace-nowrap">
+                            <i class="fas fa-search"></i> Cari
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Result Box -->
+            <div id="status-result-box" class="hidden bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
+                <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase text-slate-400">Hasil Pencarian</span>
+                        <h3 class="text-lg font-black text-slate-800" id="res-nama">-</h3>
+                    </div>
+                    <span id="res-badge-status" class="px-3 py-1 rounded-full text-xs font-bold uppercase bg-amber-100 text-amber-800">
+                        Menunggu Verifikasi
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                    <div class="space-y-2 bg-slate-50 p-3.5 rounded-xl">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Nomor Pendaftaran:</span>
+                            <span class="font-mono font-bold text-garjek-700" id="res-id">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">NIK (Dimasking):</span>
+                            <span class="font-mono font-bold text-slate-700" id="res-nik">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Jenis Layanan:</span>
+                            <span class="font-bold text-slate-800" id="res-layanan">-</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Tanggal Daftar:</span>
+                            <span class="font-medium text-slate-700" id="res-tanggal">-</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 bg-slate-50 p-3.5 rounded-xl">
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-500">Status Dokumen:</span>
+                            <span class="font-bold px-2 py-0.5 rounded text-[11px]" id="res-status-dokumen">-</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-slate-500">Status Pembayaran:</span>
+                            <span class="font-bold px-2 py-0.5 rounded text-[11px]" id="res-status-pembayaran">-</span>
+                        </div>
+                        <div class="pt-2 border-t border-slate-200">
+                            <span class="text-slate-500 block mb-1">Catatan Admin:</span>
+                            <p class="font-medium text-slate-700 bg-white p-2 rounded border border-slate-200 text-[11px]" id="res-catatan-admin">Belum ada catatan.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 mt-10 border-t border-slate-800 no-print">
+        <div class="max-w-5xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-3">
+            <p>© 2026 GARJEK Indonesia. All rights reserved.</p>
+            <div class="flex items-center space-x-4">
+                <a href="admin.html" target="_blank" class="hover:text-white transition flex items-center gap-1">
+                    <i class="fas fa-lock text-garjek-500"></i> Dashboard Admin
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Config Modal (For Setting Web App URL) -->
+    <div id="modal-config" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="text-base font-extrabold text-slate-800">Pengaturan Web App Backend</h3>
+                <button onclick="closeConfigModal()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <p class="text-slate-600">Masukkan URL Web App dari hasil <strong>Deploy Google Apps Script</strong> Anda:</p>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">URL Web App Google Apps Script</label>
+                    <input type="url" id="input-webapp-url" class="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono text-xs" placeholder="https://script.google.com/macros/s/.../exec">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeConfigModal()" class="px-4 py-2 bg-slate-200 text-slate-700 font-bold rounded-xl text-xs">Batal</button>
+                <button onclick="saveConfigUrl()" class="px-4 py-2 bg-garjek-600 text-white font-bold rounded-xl text-xs shadow">Simpan Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frontend JS Logic -->
+    <script>
+        // System Config State
+        let currentStep = 1;
+        let selectedService = 'GARBIKE';
+        let garbikeFee = 150000;
+        let garcarFee = 0;
+        let danaName = "Ahmad Syaifuddin";
+        let danaNumber = "081932592253";
+
+        // Store file objects in Base64 format
+        const uploadedFiles = {
+            ktp: null,
+            sim: null,
+            stnk: null,
+            driver: null,
+            kendaraan: null,
+            bukti: null
+        };
+
+        // Get WebApp URL from localStorage
+        function getWebAppUrl() {
+            return localStorage.getItem('garjek_webapp_url') || '';
+        }
+
+        window.onload = function() {
+            checkBackendUrl();
+            fetchSettingsFromBackend();
+        };
+
+        function checkBackendUrl() {
+            const url = getWebAppUrl();
+            const warningEl = document.getElementById('backend-warning');
+            if (!url) {
+                warningEl.classList.remove('hidden');
+            } else {
+                warningEl.classList.add('hidden');
+            }
+        }
+
+        function openConfigModal() {
+            document.getElementById('input-webapp-url').value = getWebAppUrl();
+            document.getElementById('modal-config').classList.remove('hidden');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('modal-config').classList.add('hidden');
+        }
+
+        function saveConfigUrl() {
+            const url = document.getElementById('input-webapp-url').value.trim();
+            localStorage.setItem('garjek_webapp_url', url);
+            closeConfigModal();
+            checkBackendUrl();
+            showToast('URL Web App berhasil disimpan!', 'success');
+            fetchSettingsFromBackend();
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bg = type === 'success' ? 'bg-garjek-700 text-white' : (type === 'error' ? 'bg-red-600 text-white' : 'bg-slate-800 text-white');
+            toast.className = `${bg} px-4 py-3 rounded-xl shadow-lg text-xs font-bold flex items-center justify-between gap-2 transition-all duration-300 opacity-100 transform translate-y-0`;
+            toast.innerHTML = `<span>${message}</span><i class="fas fa-times cursor-pointer" onclick="this.parentElement.remove()"></i>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Tab Navigation
+        function switchTab(tab) {
+            const tabReg = document.getElementById('tab-register');
+            const tabStatus = document.getElementById('tab-status');
+            const btnReg = document.getElementById('btn-tab-register');
+            const btnStatus = document.getElementById('btn-tab-status');
+
+            if (tab === 'register') {
+                tabReg.classList.remove('hidden');
+                tabStatus.classList.add('hidden');
+                btnReg.className = 'px-3 py-1.5 text-xs md:text-sm font-semibold rounded-lg bg-white/20 transition flex items-center gap-1.5';
+                btnStatus.className = 'px-3 py-1.5 text-xs md:text-sm font-semibold rounded-lg hover:bg-white/20 transition flex items-center gap-1.5';
+            } else {
+                tabReg.classList.add('hidden');
+                tabStatus.classList.remove('hidden');
+                btnStatus.className = 'px-3 py-1.5 text-xs md:text-sm font-semibold rounded-lg bg-white/20 transition flex items-center gap-1.5';
+                btnReg.className = 'px-3 py-1.5 text-xs md:text-sm font-semibold rounded-lg hover:bg-white/20 transition flex items-center gap-1.5';
+            }
+        }
+
+        // Step Navigation Logic
+        function goToStep(step) {
+            if (step > currentStep) {
+                if (!validateStep(currentStep)) return;
+            }
+            document.getElementById(`step-${currentStep}`).classList.add('hidden');
+            document.getElementById(`step-${step}`).classList.remove('hidden');
+
+            // Update Progress Bar
+            currentStep = step;
+            const progressPct = ((step - 1) / 5) * 100;
+            document.getElementById('progress-bar-fill').style.width = `${progressPct}%`;
+
+            for (let i = 1; i <= 6; i++) {
+                const dot = document.getElementById(`step-dot-${i}`);
+                if (i < currentStep) {
+                    dot.className = 'w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 step-done transition shadow';
+                    dot.innerHTML = '<i class="fas fa-check"></i>';
+                } else if (i === currentStep) {
+                    dot.className = 'w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 step-active transition shadow';
+                    dot.innerHTML = i;
+                } else {
+                    dot.className = 'w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 step-inactive transition shadow';
+                    dot.innerHTML = i;
+                }
+            }
+        }
+
+        function nextStep(fromStep) {
+            if (validateStep(fromStep)) {
+                goToStep(fromStep + 1);
+            }
+        }
+
+        function prevStep(fromStep) {
+            goToStep(fromStep - 1);
+        }
+
+        // Step Validations
+        function validateStep(step) {
+            if (step === 1) {
+                const nama = document.getElementById('nama_lengkap').value.trim();
+                const nik = document.getElementById('nik').value.trim();
+                const jk = document.getElementById('jenis_kelamin').value;
+                const tmpt = document.getElementById('tempat_lahir').value.trim();
+                const tgl = document.getElementById('tanggal_lahir').value;
+                const wa = document.getElementById('no_whatsapp').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const prov = document.getElementById('provinsi').value.trim();
+
+                if (!nama || !nik || !jk || !tmpt || !tgl || !wa || !email || !prov) {
+                    showToast('Harap lengkapi semua kolom wajib (*)', 'error');
+                    return false;
+                }
+                if (nik.length !== 16) {
+                    showToast('NIK wajib tepat 16 digit angka!', 'error');
+                    return false;
+                }
+                if (wa.length < 10) {
+                    showToast('Nomor WhatsApp tidak valid!', 'error');
+                    return false;
+                }
+            } else if (step === 3) {
+                const plat = document.getElementById('nomor_polisi').value.trim();
+                const merk = document.getElementById('merek_kendaraan').value.trim();
+                const tipe = document.getElementById('tipe_kendaraan').value.trim();
+                if (!plat || !merk || !tipe) {
+                    showToast('Harap isi lengkap data kendaraan!', 'error');
+                    return false;
+                }
+            } else if (step === 4) {
+                if (!uploadedFiles.ktp || !uploadedFiles.sim || !uploadedFiles.stnk || !uploadedFiles.driver || !uploadedFiles.kendaraan) {
+                    showToast('Harap unggah seluruh dokumen persyaratan!', 'error');
+                    return false;
+                }
+            } else if (step === 5) {
+                if (!uploadedFiles.bukti) {
+                    showToast('Harap unggah bukti pembayaran!', 'error');
+                    return false;
+                }
+                if (!document.getElementById('check_agree').checked) {
+                    showToast('Anda harus menyetujui pernyataan pendaftaran!', 'error');
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Service Selector
+        function selectService(service) {
+            selectedService = service;
+            document.getElementById('pilihan_layanan').value = service;
+            document.getElementById('title-service-type').innerText = service;
+
+            const cardGarbike = document.getElementById('card-garbike');
+            const cardGarcar = document.getElementById('card-garcar');
+            const checkGarbike = document.getElementById('icon-check-garbike');
+            const checkGarcar = document.getElementById('icon-check-garcar');
+
+            if (service === 'GARBIKE') {
+                cardGarbike.className = "cursor-pointer border-2 border-garjek-600 bg-garjek-50 p-5 rounded-2xl transition hover:shadow-lg relative flex flex-col justify-between";
+                cardGarcar.className = "cursor-pointer border-2 border-slate-200 bg-white p-5 rounded-2xl transition hover:shadow-lg relative flex flex-col justify-between";
+                checkGarbike.classList.remove('hidden');
+                checkGarcar.classList.add('hidden');
+                updatePaymentDisplay(garbikeFee);
+            } else {
+                cardGarcar.className = "cursor-pointer border-2 border-garjek-600 bg-garjek-50 p-5 rounded-2xl transition hover:shadow-lg relative flex flex-col justify-between";
+                cardGarbike.className = "cursor-pointer border-2 border-slate-200 bg-white p-5 rounded-2xl transition hover:shadow-lg relative flex flex-col justify-between";
+                checkGarcar.classList.remove('hidden');
+                checkGarbike.classList.add('hidden');
+                updatePaymentDisplay(garcarFee);
+            }
+        }
+
+        function updatePaymentDisplay(fee) {
+            const displayFee = "Rp " + fee.toLocaleString('id-ID');
+            document.getElementById('payment-amount-display').innerText = displayFee;
+            document.getElementById('payment-desc-display').innerText = fee > 0 ? "Termasuk Jaket, Rompi, Helm & Aktivasi Akun Garjek" : "Bebas Biaya Registrasi & Atribut Garcar";
+        }
+
+        // File Handler with Base64 Conversion
+        function handleFileSelect(input, previewId) {
+            const file = input.files[0];
+            const previewEl = document.getElementById(previewId);
+            if (!file) return;
+
+            // Validation Size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                showToast('Ukuran file maksimal 5MB!', 'error');
+                input.value = '';
+                previewEl.innerText = 'File terlalu besar (Max 5MB)';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result;
+                const fileObj = {
+                    name: file.name,
+                    mimeType: file.type,
+                    data: base64Data
+                };
+
+                if (previewId.includes('ktp')) uploadedFiles.ktp = fileObj;
+                if (previewId.includes('sim')) uploadedFiles.sim = fileObj;
+                if (previewId.includes('stnk')) uploadedFiles.stnk = fileObj;
+                if (previewId.includes('driver')) uploadedFiles.driver = fileObj;
+                if (previewId.includes('kendaraan')) uploadedFiles.kendaraan = fileObj;
+                if (previewId.includes('bukti')) uploadedFiles.bukti = fileObj;
+
+                previewEl.className = "text-[11px] font-bold text-garjek-700 mt-1 flex items-center gap-1";
+                previewEl.innerHTML = `<i class="fas fa-check-circle"></i> Terpilih: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function copyDanaNumber() {
+            const danaNum = document.getElementById('dana-number-display').innerText;
+            const tempInput = document.createElement("input");
+            tempInput.value = danaNum;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            showToast('Nomor DANA berhasil disalin: ' + danaNum, 'success');
+        }
+
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            if (!validateStep(5)) return;
+
+            const webAppUrl = getWebAppUrl();
+            const submitBtn = document.getElementById('btn-submit-form');
+            const loadingBox = document.getElementById('submit-loading');
+
+            submitBtn.disabled = true;
+            loadingBox.classList.remove('hidden');
+
+            const payload = {
+                action: 'registerDriver',
+                nama_lengkap: document.getElementById('nama_lengkap').value.trim(),
+                nik: document.getElementById('nik').value.trim(),
+                jenis_kelamin: document.getElementById('jenis_kelamin').value,
+                tempat_lahir: document.getElementById('tempat_lahir').value.trim(),
+                tanggal_lahir: document.getElementById('tanggal_lahir').value,
+                no_whatsapp: document.getElementById('no_whatsapp').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                status_pernikahan: document.getElementById('status_pernikahan').value,
+                negara: document.getElementById('negara').value,
+                provinsi: document.getElementById('provinsi').value.trim(),
+                kabupaten: document.getElementById('kabupaten').value.trim(),
+                kecamatan: document.getElementById('kecamatan').value.trim(),
+                kelurahan: document.getElementById('kelurahan').value.trim(),
+                dusun: document.getElementById('dusun').value.trim(),
+                rt: document.getElementById('rt').value.trim(),
+                rw: document.getElementById('rw').value.trim(),
+                kode_pos: document.getElementById('kode_pos').value.trim(),
+                alamat_lengkap: document.getElementById('alamat_lengkap').value.trim(),
+                pilihan_layanan: selectedService,
+                nomor_polisi: document.getElementById('nomor_polisi').value.trim(),
+                merek_kendaraan: document.getElementById('merek_kendaraan').value.trim(),
+                tipe_kendaraan: document.getElementById('tipe_kendaraan').value.trim(),
+                tahun_kendaraan: document.getElementById('tahun_kendaraan').value,
+                warna_kendaraan: document.getElementById('warna_kendaraan').value.trim(),
+                nomor_stnk: document.getElementById('nomor_stnk').value.trim(),
+                nama_pemilik_stnk: document.getElementById('nama_pemilik_stnk').value.trim(),
+                status_kepemilikan: document.getElementById('status_kepemilikan').value,
+                files: uploadedFiles
+            };
+
+            // If webAppUrl exists, send to backend GAS, else generate mock success
+            if (webAppUrl) {
+                try {
+                    document.getElementById('submit-loading-status').innerText = "Mengirim data ke server Google Apps Script...";
+                    const response = await fetch(webAppUrl, {
+                        method: 'POST',
+                        body: JSON.stringify(payload)
+                    });
+                    const resData = await response.json();
+                    if (resData.status === 'success') {
+                        showSuccessConfirmation(resData.data);
+                    } else {
+                        showToast('Gagal mendaftar: ' + resData.message, 'error');
+                    }
+                } catch (err) {
+                    console.error(err);
+                    showToast('Gagal terhubung ke Apps Script server. Memproses mode simulasi...', 'error');
+                    setTimeout(() => showMockSuccess(payload), 1500);
+                } finally {
+                    submitBtn.disabled = false;
+                    loadingBox.classList.add('hidden');
+                }
+            } else {
+                // Mock Mode
+                setTimeout(() => {
+                    showMockSuccess(payload);
+                    submitBtn.disabled = false;
+                    loadingBox.classList.add('hidden');
+                }, 1500);
+            }
+        }
+
+        function showMockSuccess(payload) {
+            const today = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            const mockId = `GJ-${today}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const mockData = {
+                nomor_pendaftaran: mockId,
+                nama_lengkap: payload.nama_lengkap,
+                nik_masked: payload.nik.substring(0, 4) + '************',
+                pilihan_layanan: payload.pilihan_layanan,
+                tanggal_pendaftaran: new Date().toLocaleDateString('id-ID'),
+                status_pendaftaran: 'MENUNGGU VERIFIKASI'
+            };
+            showSuccessConfirmation(mockData);
+        }
+
+        function showSuccessConfirmation(data) {
+            document.getElementById('rec-id').innerText = data.nomor_pendaftaran;
+            document.getElementById('rec-nama').innerText = data.nama_lengkap;
+            document.getElementById('rec-nik').innerText = data.nik_masked || '3275************';
+            document.getElementById('rec-layanan').innerText = data.pilihan_layanan;
+            document.getElementById('rec-tanggal').innerText = data.tanggal_pendaftaran || new Date().toLocaleDateString('id-ID');
+            document.getElementById('rec-status').innerText = data.status_pendaftaran || 'MENUNGGU VERIFIKASI';
+
+            goToStep(6);
+            showToast('Pendaftaran Berhasil Dikirim!', 'success');
+        }
+
+        async function fetchSettingsFromBackend() {
+            const webAppUrl = getWebAppUrl();
+            if (!webAppUrl) return;
+
+            try {
+                const res = await fetch(`${webAppUrl}?action=getSettings`);
+                const data = await res.json();
+                if (data.status === 'success' && data.settings) {
+                    garbikeFee = parseInt(data.settings.biaya_garbike) || 150000;
+                    garcarFee = parseInt(data.settings.biaya_garcar) || 0;
+                    danaName = data.settings.nama_dana || "Ahmad Syaifuddin";
+                    danaNumber = data.settings.no_dana || "081932592253";
+
+                    document.getElementById('display-fee-garbike').innerText = "Rp " + garbikeFee.toLocaleString('id-ID');
+                    document.getElementById('display-fee-garcar').innerText = garcarFee > 0 ? "Rp " + garcarFee.toLocaleString('id-ID') : "Rp 0 (Gratis)";
+                    document.getElementById('dana-name-display').innerText = danaName;
+                    document.getElementById('dana-number-display').innerText = danaNumber;
+
+                    updatePaymentDisplay(selectedService === 'GARBIKE' ? garbikeFee : garcarFee);
+                }
+            } catch (e) {
+                console.log('Using default settings.');
+            }
+        }
+
+        async function searchRegistrationStatus() {
+            const nik = document.getElementById('search-nik-input').value.trim();
+            if (nik.length !== 16) {
+                showToast('Masukkan 16 digit NIK secara lengkap!', 'error');
+                return;
+            }
+
+            const webAppUrl = getWebAppUrl();
+            const resultBox = document.getElementById('status-result-box');
+
+            if (webAppUrl) {
+                try {
+                    const res = await fetch(`${webAppUrl}?action=checkStatus&nik=${nik}`);
+                    const data = await res.json();
+                    if (data.status === 'success' && data.driver) {
+                        displaySearchResult(data.driver);
+                    } else {
+                        showToast('Data pendaftaran dengan NIK tersebut tidak ditemukan.', 'error');
+                        resultBox.classList.add('hidden');
+                    }
+                } catch (e) {
+                    showToast('Gagal menghubungi server.', 'error');
+                }
+            } else {
+                // Mock Search Result
+                displaySearchResult({
+                    nomor_pendaftaran: 'GJ-20260912-0001',
+                    nama_lengkap: 'AHM** SYA******',
+                    nik_masked: nik.substring(0, 4) + '************',
+                    pilihan_layanan: 'GARBIKE',
+                    tanggal_pendaftaran: '12/09/2026',
+                    status_dokumen: 'Lengkap',
+                    status_pembayaran: 'Terverifikasi',
+                    status_pendaftaran: 'Disetujui',
+                    catatan_admin: 'Pendaftaran telah disetujui. Atribut dapat diambil di kantor cabang.'
+                });
+            }
+        }
+
+        function displaySearchResult(driver) {
+            const resultBox = document.getElementById('status-result-box');
+            resultBox.classList.remove('hidden');
+
+            document.getElementById('res-nama').innerText = driver.nama_lengkap;
+            document.getElementById('res-id').innerText = driver.nomor_pendaftaran;
+            document.getElementById('res-nik').innerText = driver.nik_masked;
+            document.getElementById('res-layanan').innerText = driver.pilihan_layanan;
+            document.getElementById('res-tanggal').innerText = driver.tanggal_pendaftaran;
+
+            const badgeStatus = document.getElementById('res-badge-status');
+            badgeStatus.innerText = driver.status_pendaftaran;
+            if (driver.status_pendaftaran === 'Disetujui') {
+                badgeStatus.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase bg-green-100 text-green-800';
+            } else if (driver.status_pendaftaran === 'Ditolak') {
+                badgeStatus.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase bg-red-100 text-red-800';
+            } else {
+                badgeStatus.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase bg-amber-100 text-amber-800';
+            }
+
+            document.getElementById('res-status-dokumen').innerText = driver.status_dokumen || 'Menunggu Verification';
+            document.getElementById('res-status-pembayaran').innerText = driver.status_pembayaran || 'Belum Diverifikasi';
+            document.getElementById('res-catatan-admin').innerText = driver.catatan_admin || 'Tidak ada catatan khusus dari admin.';
+        }
+    </script>
+</body>
+</html>
